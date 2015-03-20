@@ -13,7 +13,7 @@ mode="move"
 zcount=1000
 
 #usage info
-usage="USAGE:$0 [-n] [-m|--mode copytruncate|move] [-s|--size minsize] [-z count] filename"
+usage="USAGE:$0 [-n] [-m|--mode copytruncate|move] [-s|--size 100|100k|100M|100G] [-z count] filename"
 
 #getopt 
 while true; do
@@ -36,6 +36,26 @@ while true; do
 						esac;;
 			-s|--size)
 				minsize=$2
+				#size format handler
+				unit=${minsize//[0-9]/''}
+				d=${minsize//[^0-9]/''}
+				case ${unit} in
+					GB|Gb|gb|g|G)
+						minsize=$[d*1024*1024]
+						;;
+					MB|Mb|mb|M|m)
+						minsize=$[d*1024]
+						;;
+					KB|Kb|kb|K|k)
+						minsize=${d}
+						;;
+					'')
+						minsize=$[minsize/1024]
+						;;
+					*)
+						echo -e "ERROR SIZE!\n${usage}"
+						exit 1;;
+				esac	
 				shift 2;;
 			-z)	
 				zcount=$2
@@ -87,6 +107,8 @@ mv ${filename} ${filename}.1
 touch ${filename}
 }
 
+#TEST 
+echo $minsize
 #main
 if [ $rotation ];then
 	if [ $(du ${filename} | awk '{print $1}') -gt ${minsize:--1} ];then
