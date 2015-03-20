@@ -23,17 +23,17 @@ while true; do
 				rotation=0
 				shift;;
 			-m|--mode)
-						case $2 in
-							copytruncate)
-								mode="cptr"
-								shift 2;;
-							move)
-								mode="move"
-								shift 2;;
-							*)
-								echo -e "NO SUCH MODE\n${usage}"
-								exit 1;;
-						esac;;
+				case $2 in
+					copytruncate)
+						mode="cptr"
+						shift 2;;
+					move)
+						mode="move"
+						shift 2;;
+					*)
+						echo -e "NO SUCH MODE\n${usage}"
+						exit 1;;
+				esac;;
 			-s|--size)
 				minsize=$2
 				#size format handler
