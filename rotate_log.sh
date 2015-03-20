@@ -107,8 +107,6 @@ mv ${filename} ${filename}.1
 touch ${filename}
 }
 
-#TEST 
-echo $minsize
 #main
 if [ $rotation ];then
 	if [ $(du ${filename} | awk '{print $1}') -gt ${minsize:--1} ];then
