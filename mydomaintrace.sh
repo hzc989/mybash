@@ -17,7 +17,6 @@ if [ "x$domain" != "x" ];then
 	curl http://ftp.internic.net/domain/named.cache | grep "^\."
 	#get the first line of the root DNS Server as root server
 	root=`curl http://ftp.internic.net/domain/named.cache | grep "^\." | awk '{print $4}' | sed -n '1p'`
-	echo $root	
 	#init the parameters 
 	current=${domain##*.}
 	rest=${domain%.*}
