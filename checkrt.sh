@@ -8,7 +8,7 @@
 ip="${1-"220.181.30.53"}"
 #using mtr to check route
 echo -e "[`date`]START checking route to $ip\n\
-No.hop IpAddr Loss% Snt Last Avg Best Wrst StDev" >> /var/log/checkrt.log
+No.hop IpAddr	Loss% Snt Last Avg Best Wrst StDev" >> /var/log/checkrt.log
 mtr -n --report -c 100 $ip | sed '1d' | while read LINE
 do
 loss=`echo $LINE | awk '{split($0,a," ");print a[3]}'`
@@ -16,7 +16,7 @@ avg=`echo $LINE | awk '{split($0,a," ");print a[6]}'`
 
 #filter 100%loss route
 if [ "$loss" == "sed" ];then
-	echo $LINE | sed 's/awk sed/unkown/' >> /var/log/checkrt.log
+	echo $LINE | sed 's/awk sed/  unknown  /' >> /var/log/checkrt.log
 	continue
 fi
 if [ ${loss%.*} -ge 10 -o ${avg%.*} -ge 50 ];then
