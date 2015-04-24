@@ -13,30 +13,25 @@ if [ "x$domain" != "x" ];then
 		domain=${domain%*.} #remove the root. from the domain	
 	fi			
 	#start getting Root DNS Server
-	echo -e "-------getting root DNS Server:-------\n"
-	curl http://ftp.internic.net/domain/named.cache | grep "^\."
+	echo -e "-------getting root DNS Server-------\n"
+	curl -s http://ftp.internic.net/domain/named.cache | grep "^\."
 	#get the first line of the root DNS Server as root server
-	root=`curl http://ftp.internic.net/domain/named.cache | grep "^\." | awk '{print $4}' | sed -n '1p'`
+	root=`curl -s http://ftp.internic.net/domain/named.cache | grep "^\." | awk '{print $4}' | sed -n '1p'`
 	#init the parameters 
-	current=${domain##*.}
-	rest=${domain%.*}
 	dns=$root
-	#recursively getting the dns server
-	while [ "$current" != "${domain%%.*}.$domain" ]
+	answer=""
+	#recursively query before getting ANSWER SECTION
+	while [ "$answer" != ";; ANSWER SECTION:" ]
 	do
-	echo -e "\n-------getting $current DNS Server-------\n"
-	if [ "$current" == "$domain" ];then
-		dig $current @$dns | grep -A 5 "^$current" | grep -v "^;;" 
-	else
-		dig $current @$dns | grep "^$current"
+	answer=`dig $domain @$dns | grep ";; ANSWER SECTION:"`
+	echo -e "\n-------query from $dns-------\n"
+	if [ "$answer" != ";; ANSWER SECTION:" ];then
+		dig $domain @$dns | grep -w "NS" #display the AUTHORITY SECTION
+	else #display the ANSWER SECTION
+		dig $domain @$dns | grep -A 3 ";; ANSWER SECTION:" | grep -v ";;"
 	fi
 	#get the first line of the DNS Servers as the next dns server
-	type=`dig $current @$dns | grep "^$current" | awk '{print $4}' | sed -n '1p'`
-	if [ "$type" == "NS" ];then
-	dns=`dig $current @$dns | grep "^$current" | awk '{print $5}' | sed -n '1p'`
-	fi
-	current="${rest##*.}.$current"
-	rest=${rest%.*}
+	dns=`dig $domain @$dns | grep -w "NS" | awk '{print $5}' | sed -n '1p'`
 	done
 else
 	usage="USAGE:./mydomaintrace.sh domain"
